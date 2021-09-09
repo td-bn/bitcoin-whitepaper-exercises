@@ -54,11 +54,29 @@ function createBlock(data) {
 }
 
 function blockHash(bl) {
-	// TODO
+	let nonce = 0;
+	let buff, hash;
+	do {
+		nonce++;
+		bl.nonce = nonce;
+		buff = Buffer.from(JSON.stringify(bl));
+		hash = crypto.createHash("sha256").update(buff).digest("hex")
+	} while(!hashIsLowEnough(hash))
+	return hash;
 }
 
 function hashIsLowEnough(hash) {
-	// TODO
+	const hex2bin = (str) => (parseInt(str, 16).toString(2)).padStart(4,"0");
+	let expected = "";
+	expected = expected.padStart(difficulty, "0");
+	let c, result;
+	result = "";
+	
+	for(let i=0; i< hash.length; i++) {
+		c = hash.substring(i,i+1);
+		result += hex2bin(c);
+	}
+	return result.substr(0,difficulty) === expected;
 }
 
 function verifyBlock(bl) {

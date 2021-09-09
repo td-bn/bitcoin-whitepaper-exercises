@@ -5,7 +5,8 @@ var fs = require("fs");
 var crypto = require("crypto");
 
 const KEYS_DIR = path.join(__dirname,"keys");
-const PUB_KEY_TEXT = fs.readFileSync(path.join(KEYS_DIR,"pub.pgp.key"),"utf8");
+// const PUB_KEY_TEXT = fs.rearningseadFileSync(path.join(KEYS_DIR,"pub.pgp.key"),"utf8");
+const PUB_KEY_TEXT = "MYPUBKEY";
 
 // The Power of a Smile
 // by Tupac Shakur
@@ -46,15 +47,44 @@ countMyEarnings();
 // **********************************
 
 function addPoem() {
-	// TODO: add lines of poem as transactions to the transaction-pool
+	for (const line of poem) {
+		transactionPool.push({
+			data: line,
+			fee: Math.floor(Math.random() * 10)
+		})
+	}
 }
 
 function processPool() {
-	// TODO: process the transaction-pool in order of highest fees
+	transactionPool = transactionPool.sort( (a,b) => a.fee - b.fee );
+
+	let data;
+	while (transactionPool.length != 0) {
+		data = {
+			blockFee: blockFee,
+			account: PUB_KEY_TEXT,
+			transactions: []
+		};
+
+		for(let i=0; i<maxBlockSize; i++) {
+			data.transactions.push(transactionPool.pop());
+		}
+		Blockchain.blocks.push(createBlock(data));
+	}
 }
 
 function countMyEarnings() {
-	// TODO: count up block-fees and transaction-fees
+	let earnings = 0;
+	for (let i=1; i<Blockchain.blocks.length; i++) {
+		const block = Blockchain.blocks[i];
+		// console.log(block)
+		const data = block.data;
+		for (const t of data.transactions) {
+			earnings += t.fee	
+		}
+		earnings += data.blockFee;
+	}
+	console.log("Earnings: ", earnings);
 }
 
 function createBlock(data) {

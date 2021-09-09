@@ -50,13 +50,15 @@ function createBlock(data) {
 	const prevHash = blockHash(prevBlock);
 	const timeStamp = Date.now();
 
-	return {
+	const block =  {
 		index: len,
 		prevHash: prevHash,
 		data: data,
 		timestamp: timeStamp,
-		hash: crypto.createHash("sha256").update(`${len}${prevHash}${data}${timeStamp}`).digest("hex")
 	};
+
+	block.hash = blockHash(block);
+	return block;
 }
 
 function verifyBlock(bl) {
